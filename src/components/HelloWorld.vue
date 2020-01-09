@@ -1,122 +1,153 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br />
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener"
-        >vue-cli documentation</a
-      >.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel"
-          target="_blank"
-          rel="noopener"
-          >babel</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript"
-          target="_blank"
-          rel="noopener"
-          >typescript</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint"
-          target="_blank"
-          rel="noopener"
-          >eslint</a
-        >
-      </li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li>
-        <a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a>
-      </li>
-      <li>
-        <a href="https://forum.vuejs.org" target="_blank" rel="noopener"
-          >Forum</a
-        >
-      </li>
-      <li>
-        <a href="https://chat.vuejs.org" target="_blank" rel="noopener"
-          >Community Chat</a
-        >
-      </li>
-      <li>
-        <a href="https://twitter.com/vuejs" target="_blank" rel="noopener"
-          >Twitter</a
-        >
-      </li>
-      <li>
-        <a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a>
-      </li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li>
-        <a href="https://router.vuejs.org" target="_blank" rel="noopener"
-          >vue-router</a
-        >
-      </li>
-      <li>
-        <a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/vue-devtools#vue-devtools"
-          target="_blank"
-          rel="noopener"
-          >vue-devtools</a
-        >
-      </li>
-      <li>
-        <a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener"
-          >vue-loader</a
-        >
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-          rel="noopener"
-          >awesome-vue</a
-        >
-      </li>
-    </ul>
+  <div>
+    <p>Origin: {{ origin }}</p>
+    <div
+      class="spinner"
+      v-on:mousemove="spinScroll"
+      unselectable="on"
+      onselectstart="return false;"
+      onmousedown="return false;"
+      :style="{
+        transform: `rotate(${angle}deg)`,
+        width: `${circleSize}em`,
+        height: `${circleSize}em`
+      }"
+    >
+      <div
+        v-for="item in t"
+        :key="item.value"
+        class="item"
+        :style="{
+          transform: `rotate(${item.rot1}deg) translate(${
+            item.translate
+          }em) rotate(${-item.rot1 - angle}deg)`,
+          width: `${itemSize}em`,
+          height: `${itemSize}em`,
+          margin: `${-(itemSize / 2)}em`
+        }"
+      >
+        {{ item.value }}
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 @Component
 export default class HelloWorld extends Vue {
-  @Prop() private msg!: string;
+  @Prop() private items!: string[];
+
+  @Prop() private circleSize!: number;
+
+  @Prop() private itemSize!: number;
+
+  private origin: Point | null = null;
+  private angle: number = 0;
+  private initialAngle: number = 0;
+  private t: any[] = [];
+
+  mounted() {
+    this.initialAngle = 360 / this.items.length;
+    let rot = 0;
+    this.t = this.items.map(item => {
+      const i = {
+        value: item,
+        rot1: rot,
+        translate: this.circleSize / 2 - this.itemSize / 2
+      };
+      rot += this.initialAngle;
+      return i;
+    });
+  }
+
+  spinScroll(evt: MouseEvent) {
+    if (evt.buttons) {
+      if (!this.origin) this.origin = { x: evt.clientX, y: evt.clientY };
+      const hDiff = this.origin.y - evt.clientY;
+      this.angle = hDiff;
+      this.$refs.item1;
+    } else {
+      this.origin = null;
+    }
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
+.item {
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
+  background-color: red;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-ul {
-  list-style-type: none;
+
+/// Mixin to place items on a circle
+/// @author Hugo Giraudel
+/// @author Ana Tudor
+/// @param {Integer} $item-count - Number of items on the circle
+/// @param {Length} $circle-size - Large circle size
+/// @param {Length} $item-size - Single item size
+@mixin on-circle($item-count, $circle-size, $item-size) {
+  position: relative;
+  width: $circle-size;
+  height: $circle-size;
   padding: 0;
+  border-radius: 50%;
+  list-style: none;
+
+  > * {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: $item-size;
+    height: $item-size;
+    margin: -($item-size / 2);
+
+    $angle: (360 / $item-count);
+    $rot: 0;
+
+    // @for $i from 1 through $item-count {
+    //   &:nth-of-type(#{$i}):not(.center) {
+    //     transform: rotate($rot * 1deg)
+    //       translate(($circle-size / 2) - ($item-size / 2))
+    //       rotate($rot * -1deg); // Last rotate is the item itself
+    //   }
+
+    //   $rot: $rot + $angle;
+    // }
+  }
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+
+@keyframes spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }
-a {
-  color: #42b983;
+
+.spinner {
+  position: relative;
+  padding: 0;
+  border-radius: 50%;
+  list-style: none;
+  > * {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  }
+  // @include on-circle($item-count: 6, $circle-size: 20em, $item-size: 5em);
+  // animation: spin 1s linear 1s;
 }
 </style>
