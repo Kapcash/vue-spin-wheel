@@ -1,14 +1,19 @@
 <template>
   <div>
     <p>Origin: {{ origin }}</p>
+    <p>lengthOriginNow: {{ lenghtOriginNow }}</p>
+    <p>lenghtCenterNow: {{ lenghtCenterNow }}</p>
+    <p>lenghtCenterOrigin: {{ lenghtCenterOrigin }}</p>
+    <p>angle: {{ angle }}</p>
     <div
       class="spinner"
+      ref="spinner"
       v-on:mousemove="spinScroll"
       unselectable="on"
       onselectstart="return false;"
       onmousedown="return false;"
       :style="{
-        transform: `rotate(${angle}deg)`,
+        transform: `rotate(${angle}rad)`,
         width: `${circleSize}em`,
         height: `${circleSize}em`
       }"
@@ -20,7 +25,7 @@
         :style="{
           transform: `rotate(${item.rot1}deg) translate(${
             item.translate
-          }em) rotate(${-item.rot1 - angle}deg)`,
+          }em) rotate(${-item.rot1 - angle}rad)`,
           width: `${itemSize}em`,
           height: `${itemSize}em`,
           margin: `${-(itemSize / 2)}em`
@@ -52,10 +57,19 @@ export default class HelloWorld extends Vue {
   private angle: number = 0;
   private t: any[] = [];
   private hDiff: number = 0;
+  private spinnerCenter: Point = { x: 0, y: 0 };
+
+  private lenghtCenterOrigin: number = 0;
+  private lenghtCenterNow: number = 0;
+  private lenghtOriginNow: number = 0;
 
   mounted() {
     const initialAngle = 360 / this.items.length;
     let rot = 0;
+    this.spinnerCenter = {
+      x: this.$refs.spinner.offsetLeft + this.$refs.spinner.offsetWidth / 2,
+      y: this.$refs.spinner.offsetTop + this.$refs.spinner.offsetHeight / 2
+    };
     this.t = this.items.map(item => {
       const i = {
         value: item,
@@ -69,14 +83,34 @@ export default class HelloWorld extends Vue {
 
   spinScroll(evt: MouseEvent) {
     if (evt.buttons) {
-      if (!this.origin) this.origin = { x: evt.clientX, y: evt.clientY };
+      const currentPoint: Point = { x: evt.clientX, y: evt.clientY };
+      if (!this.origin) this.origin = currentPoint;
+      this.lenghtOriginNow = this.computeLenght(this.origin, currentPoint);
+      this.lenghtCenterOrigin = this.computeLenght(
+        this.origin,
+        this.spinnerCenter
+      );
+      this.lenghtCenterNow = this.computeLenght(
+        currentPoint,
+        this.spinnerCenter
+      );
       const newHDiff = -(this.origin.y - evt.clientY);
-      this.angle = (this.angle + (newHDiff - this.hDiff)) % 360;
-      this.hDiff = newHDiff;
+      // this.angle = (this.angle + (newHDiff - this.hDiff)) % 360;
+      // this.hDiff = newHDiff;
+      this.angle = Math.acos(
+        (Math.pow(this.lenghtCenterOrigin, 2) +
+          Math.pow(this.lenghtCenterNow, 2) -
+          Math.pow(this.lenghtOriginNow, 2)) /
+          (2 * this.lenghtCenterOrigin * this.lenghtCenterNow)
+      );
     } else {
       this.origin = null;
       this.hDiff = 0;
     }
+  }
+
+  computeLenght(a: Point, b: Point): number {
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
   }
 }
 </script>
