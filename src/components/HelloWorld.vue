@@ -50,11 +50,11 @@ export default class HelloWorld extends Vue {
 
   private origin: Point | null = null;
   private angle: number = 0;
-  private initialAngle: number = 0;
   private t: any[] = [];
+  private hDiff: number = 0;
 
   mounted() {
-    this.initialAngle = 360 / this.items.length;
+    const initialAngle = 360 / this.items.length;
     let rot = 0;
     this.t = this.items.map(item => {
       const i = {
@@ -62,7 +62,7 @@ export default class HelloWorld extends Vue {
         rot1: rot,
         translate: this.circleSize / 2 - this.itemSize / 2
       };
-      rot += this.initialAngle;
+      rot += initialAngle;
       return i;
     });
   }
@@ -70,11 +70,12 @@ export default class HelloWorld extends Vue {
   spinScroll(evt: MouseEvent) {
     if (evt.buttons) {
       if (!this.origin) this.origin = { x: evt.clientX, y: evt.clientY };
-      const hDiff = this.origin.y - evt.clientY;
-      this.angle = hDiff;
-      this.$refs.item1;
+      const newHDiff = -(this.origin.y - evt.clientY);
+      this.angle = (this.angle + (newHDiff - this.hDiff)) % 360;
+      this.hDiff = newHDiff;
     } else {
       this.origin = null;
+      this.hDiff = 0;
     }
   }
 }
