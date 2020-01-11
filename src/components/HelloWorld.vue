@@ -1,10 +1,12 @@
 <template>
-  <div>
-    <p>Origin: {{ origin }}</p>
-    <p>lengthOriginNow: {{ lenghtOriginNow }}</p>
-    <p>lenghtCenterNow: {{ lenghtCenterNow }}</p>
-    <p>lenghtCenterOrigin: {{ lenghtCenterOrigin }}</p>
-    <p>angle: {{angle}} {{ (angle * 180) / Math.PI }}</p>
+  <div class="main">
+    <div
+      class="point"
+      :style="{
+        top: `${spinnerCenter.y}px`,
+        left: `${spinnerCenter.x}px`
+      }"
+    ></div>
     <div
       class="spinner"
       ref="spinner"
@@ -34,17 +36,24 @@
         {{ item.value }}
       </div>
     </div>
+    <div>
+      <p>Origin: {{ origin }}</p>
+      <p>spinnerCenter: {{ spinnerCenter }}</p>
+      <p>scalar: {{ scalar }}</p>
+      <p>angle: {{ angle }} {{ (angle * 180) / Math.PI }}</p>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 interface Point {
   x: number;
   y: number;
 }
 
+// TODO Use JSX instead to render templates
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private items!: string[];
@@ -56,20 +65,17 @@ export default class HelloWorld extends Vue {
   private origin: Point | null = null;
   private angle: number = 0;
   private t: any[] = [];
-  private spinnerCenter: Point = { x: 0, y: 0 };
 
   private lenghtCenterOrigin: number = 0;
   private lenghtCenterNow: number = 0;
   private lenghtOriginNow: number = 0;
 
+  private spinnerCenter: Point = { x: 0, y: 0 };
+  private scalar: number = 0;
+
   mounted() {
     const initialAngle = 360 / this.items.length;
-    const spinnerRef: HTMLElement = this.$refs.spinner as HTMLElement;
     let rot = 0;
-    this.spinnerCenter = {
-      x: spinnerRef.offsetLeft + spinnerRef.offsetWidth / 2,
-      y: spinnerRef.offsetTop + spinnerRef.offsetHeight / 2
-    };
     this.t = this.items.map(item => {
       const i = {
         value: item,
@@ -83,19 +89,22 @@ export default class HelloWorld extends Vue {
 
   spinScroll(evt: MouseEvent) {
     if (evt.buttons) {
-      const currentPoint: Point = { x: evt.clientX, y: evt.clientY };
+      this.spinnerCenter = this.getSpinnerCenterPoint();
+
+      const currentPoint: Point = {
+        x: evt.clientX - this.spinnerCenter.x,
+        y: this.spinnerCenter.y - evt.clientY
+      };
       if (!this.origin) this.origin = currentPoint;
-      this.lenghtOriginNow = this.computeLenght(this.origin, currentPoint);
-      this.lenghtCenterOrigin = this.computeLenght(
-        this.origin,
-        this.spinnerCenter
-      );
-      this.lenghtCenterNow = this.computeLenght(currentPoint, this.spinnerCenter);
+      // Scalar product of vectors CO and CN (where C = center, O = origin, N = new current point)
+      // As C = (0, 0), the vectors values are actually the position of their second point.
+      this.scalar =
+        this.origin.x * currentPoint.x + this.origin.y * currentPoint.y;
+
+      this.lenghtCenterOrigin = this.computeLenght(this.origin, { x: 0, y: 0 });
+      this.lenghtCenterNow = this.computeLenght(currentPoint, { x: 0, y: 0 });
       let newAngle = Math.acos(
-        (Math.pow(this.lenghtCenterOrigin, 2) +
-          Math.pow(this.lenghtCenterNow, 2) -
-          Math.pow(this.lenghtOriginNow, 2)) /
-          (2 * this.lenghtCenterOrigin * this.lenghtCenterNow)
+        this.scalar / (2 * this.lenghtCenterOrigin * this.lenghtCenterNow)
       );
       this.angle = newAngle;
     } else {
@@ -103,7 +112,15 @@ export default class HelloWorld extends Vue {
     }
   }
 
-  computeLenght(a: Point, b: Point): number {
+  private getSpinnerCenterPoint(): Point {
+    const spinnerRef: HTMLElement = this.$refs.spinner as HTMLElement;
+    return {
+      x: spinnerRef.offsetLeft + spinnerRef.offsetWidth / 2,
+      y: spinnerRef.offsetTop + spinnerRef.offsetHeight / 2
+    };
+  }
+
+  private computeLenght(a: Point, b: Point): number {
     return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
   }
 }
@@ -111,6 +128,11 @@ export default class HelloWorld extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
 .item {
   width: 50px;
   height: 50px;
@@ -120,6 +142,13 @@ export default class HelloWorld extends Vue {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.point {
+  position: absolute;
+  background-color: blue;
+  width: 2px;
+  height: 2px;
 }
 
 /// Mixin to place items on a circle
