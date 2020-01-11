@@ -4,7 +4,7 @@
     <p>lengthOriginNow: {{ lenghtOriginNow }}</p>
     <p>lenghtCenterNow: {{ lenghtCenterNow }}</p>
     <p>lenghtCenterOrigin: {{ lenghtCenterOrigin }}</p>
-    <p>angle: {{ angle }}</p>
+    <p>angle: {{angle}} {{ (angle * 180) / Math.PI }}</p>
     <div
       class="spinner"
       ref="spinner"
@@ -23,7 +23,7 @@
         :key="item.value"
         class="item"
         :style="{
-          transform: `rotate(${item.rot1}deg) translate(${
+          transform: `rotate(${item.rot1}rad) translate(${
             item.translate
           }em) rotate(${-item.rot1 - angle}rad)`,
           width: `${itemSize}em`,
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
 interface Point {
   x: number;
@@ -56,7 +56,6 @@ export default class HelloWorld extends Vue {
   private origin: Point | null = null;
   private angle: number = 0;
   private t: any[] = [];
-  private hDiff: number = 0;
   private spinnerCenter: Point = { x: 0, y: 0 };
 
   private lenghtCenterOrigin: number = 0;
@@ -65,15 +64,16 @@ export default class HelloWorld extends Vue {
 
   mounted() {
     const initialAngle = 360 / this.items.length;
+    const spinnerRef: HTMLElement = this.$refs.spinner as HTMLElement;
     let rot = 0;
     this.spinnerCenter = {
-      x: this.$refs.spinner.offsetLeft + this.$refs.spinner.offsetWidth / 2,
-      y: this.$refs.spinner.offsetTop + this.$refs.spinner.offsetHeight / 2
+      x: spinnerRef.offsetLeft + spinnerRef.offsetWidth / 2,
+      y: spinnerRef.offsetTop + spinnerRef.offsetHeight / 2
     };
     this.t = this.items.map(item => {
       const i = {
         value: item,
-        rot1: rot,
+        rot1: rot * (Math.PI / 180),
         translate: this.circleSize / 2 - this.itemSize / 2
       };
       rot += initialAngle;
@@ -90,22 +90,16 @@ export default class HelloWorld extends Vue {
         this.origin,
         this.spinnerCenter
       );
-      this.lenghtCenterNow = this.computeLenght(
-        currentPoint,
-        this.spinnerCenter
-      );
-      const newHDiff = -(this.origin.y - evt.clientY);
-      // this.angle = (this.angle + (newHDiff - this.hDiff)) % 360;
-      // this.hDiff = newHDiff;
-      this.angle = Math.acos(
+      this.lenghtCenterNow = this.computeLenght(currentPoint, this.spinnerCenter);
+      let newAngle = Math.acos(
         (Math.pow(this.lenghtCenterOrigin, 2) +
           Math.pow(this.lenghtCenterNow, 2) -
           Math.pow(this.lenghtOriginNow, 2)) /
           (2 * this.lenghtCenterOrigin * this.lenghtCenterNow)
       );
+      this.angle = newAngle;
     } else {
       this.origin = null;
-      this.hDiff = 0;
     }
   }
 
