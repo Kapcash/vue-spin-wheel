@@ -15,38 +15,33 @@
       onselectstart="return false;"
       onmousedown="return false;"
       :style="{
-        transform: `rotate(${angle}rad)`,
+        transform: `rotate(${signedAngle}rad)`,
         width: `${circleSize}em`,
         height: `${circleSize}em`
       }"
     >
-      <div
-        v-for="item in t"
+      <a
+        v-for="item in bubbles"
         :key="item.value"
         class="item"
         :style="{
           transform: `rotate(${item.rot1}rad) translate(${
             item.translate
-          }em) rotate(${-item.rot1 - angle}rad)`,
+          }em) rotate(${-item.rot1 - signedAngle}rad)`,
           width: `${itemSize}em`,
           height: `${itemSize}em`,
           margin: `${-(itemSize / 2)}em`
         }"
       >
         {{ item.value }}
-      </div>
-    </div>
-    <div>
-      <p>Origin: {{ origin }}</p>
-      <p>spinnerCenter: {{ spinnerCenter }}</p>
-      <p>scalar: {{ scalar }}</p>
-      <p>angle: {{ angle }} {{ (angle * 180) / Math.PI }}</p>
+      </a>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { Vector } from "ts-matrix";
 
 interface Point {
   x: number;
@@ -62,21 +57,17 @@ export default class HelloWorld extends Vue {
 
   @Prop() private itemSize!: number;
 
+  /** The point of first click before drag */
   private origin: Point | null = null;
-  private angle: number = 0;
-  private t: any[] = [];
-
-  private lenghtCenterOrigin: number = 0;
-  private lenghtCenterNow: number = 0;
-  private lenghtOriginNow: number = 0;
-
+  /** The center point of the spinner div */
   private spinnerCenter: Point = { x: 0, y: 0 };
-  private scalar: number = 0;
+  private signedAngle: number = 0;
+  private bubbles: any[] = [];
 
-  mounted() {
+  created() {
     const initialAngle = 360 / this.items.length;
     let rot = 0;
-    this.t = this.items.map(item => {
+    this.bubbles = this.items.map(item => {
       const i = {
         value: item,
         rot1: rot * (Math.PI / 180),
@@ -95,18 +86,13 @@ export default class HelloWorld extends Vue {
         x: evt.clientX - this.spinnerCenter.x,
         y: this.spinnerCenter.y - evt.clientY
       };
+      // If no origin, then this first click is the origin point.
       if (!this.origin) this.origin = currentPoint;
-      // Scalar product of vectors CO and CN (where C = center, O = origin, N = new current point)
-      // As C = (0, 0), the vectors values are actually the position of their second point.
-      this.scalar =
-        this.origin.x * currentPoint.x + this.origin.y * currentPoint.y;
 
-      this.lenghtCenterOrigin = this.computeLenght(this.origin, { x: 0, y: 0 });
-      this.lenghtCenterNow = this.computeLenght(currentPoint, { x: 0, y: 0 });
-      let newAngle = Math.acos(
-        this.scalar / (2 * this.lenghtCenterOrigin * this.lenghtCenterNow)
+      this.signedAngle = this.get360angle(
+        new Vector([currentPoint.x, currentPoint.y, 0]),
+        new Vector([this.origin.x, this.origin.y, 0])
       );
-      this.angle = newAngle;
     } else {
       this.origin = null;
     }
@@ -120,8 +106,11 @@ export default class HelloWorld extends Vue {
     };
   }
 
-  private computeLenght(a: Point, b: Point): number {
-    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+  private get360angle(Va: Vector, Vb: Vector) {
+    return -Math.atan2(
+      Vb.cross(Va).dot(new Vector([0, 0, 1]).normalize()),
+      Va.dot(Vb)
+    );
   }
 }
 </script>

@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "core-js": "^3.4.4",
+    "ts-matrix": "git+ssh://git@github.com/kapcash/tsm.git",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.3.0"
   },
   "devDependencies": {
+    "@types/webpack-env": "^1.15.1",
     "@vue/cli-plugin-babel": "^4.1.0",
     "@vue/cli-plugin-eslint": "^4.1.0",
     "@vue/cli-plugin-typescript": "^4.1.0",
