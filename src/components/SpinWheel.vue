@@ -50,7 +50,7 @@ interface Bubble {
 
 // TODO Use JSX instead to render templates
 @Component
-export default class HelloWorld extends Vue {
+export default class SpinWheel extends Vue {
   @Prop() private items!: string[];
 
   @Prop() private circleSize!: number;

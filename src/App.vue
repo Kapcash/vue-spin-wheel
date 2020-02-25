@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <HelloWorld circle-size="20" item-size="5" :items="items" />
+    <spin-wheel circle-size="20" item-size="5" :items="items" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "./components/HelloWorld.vue";
+import SpinWheel from "./components/SpinWheel.vue";
 
 @Component({
   components: {
-    HelloWorld
+    SpinWheel
   }
 })
 export default class App extends Vue {
