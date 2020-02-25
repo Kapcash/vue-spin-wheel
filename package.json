@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.4.4",
-    "ts-matrix": "git+ssh://git@github.com/kapcash/tsm.git",
+    "ts-matrix": "^1.0.0",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.3.0"
