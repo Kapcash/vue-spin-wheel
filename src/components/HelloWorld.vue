@@ -1,41 +1,35 @@
 <template>
-  <div class="main">
-    <div
-      class="point"
+  <div
+    class="spinner"
+    ref="spinner"
+    v-on:mousemove="spinScroll"
+    unselectable="on"
+    onselectstart="return false;"
+    onmousedown="return false;"
+    onmousemove="spinScroll(event)"
+    onmouseup="resetOrigin(event)"
+    ontouchend="resetOrigin(event)"
+    ontouchmove="spinScroll(event)"
+    :style="{
+      width: `${circleSize}em`,
+      height: `${circleSize}em`
+    }">
+    <a
+      v-for="item in bubbles"
+      :key="item.value"
+      class="item"
       :style="{
-        top: `${spinnerCenter.y}px`,
-        left: `${spinnerCenter.x}px`
-      }"
-    ></div>
-    <div
-      class="spinner"
-      ref="spinner"
-      v-on:mousemove="spinScroll"
-      unselectable="on"
-      onselectstart="return false;"
-      onmousedown="return false;"
-      :style="{
-        transform: `rotate(${signedAngle}rad)`,
-        width: `${circleSize}em`,
-        height: `${circleSize}em`
+        transform: `rotate(${item.rotation}rad) translate(${
+          item.translate
+        }em) rotate(${-item.rotation}rad)`,
+        width: `${itemSize}em`,
+        height: `${itemSize}em`,
+        margin: `${-(itemSize / 2)}em`
       }"
     >
-      <a
-        v-for="item in bubbles"
-        :key="item.value"
-        class="item"
-        :style="{
-          transform: `rotate(${item.rot1}rad) translate(${
-            item.translate
-          }em) rotate(${-item.rot1 - signedAngle}rad)`,
-          width: `${itemSize}em`,
-          height: `${itemSize}em`,
-          margin: `${-(itemSize / 2)}em`
-        }"
-      >
-        {{ item.value }}
-      </a>
-    </div>
+      {{ item.value }}
+    </a>
+    <a class="item spinner-center">CENTER</a>
   </div>
 </template>
 
@@ -48,6 +42,12 @@ interface Point {
   y: number;
 }
 
+interface Bubble {
+  value: string;
+  rotation: number;
+  translate: number;
+}
+
 // TODO Use JSX instead to render templates
 @Component
 export default class HelloWorld extends Vue {
@@ -57,60 +57,89 @@ export default class HelloWorld extends Vue {
 
   @Prop() private itemSize!: number;
 
+  /** Items enriched with style */
+  private bubbles: Bubble[] = [];
   /** The point of first click before drag */
   private origin: Point | null = null;
   /** The center point of the spinner div */
   private spinnerCenter: Point = { x: 0, y: 0 };
-  private signedAngle: number = 0;
-  private bubbles: any[] = [];
+  /** The current rotation radian angle */
+  private angle: number = 0;
+  /** The last rotation radian angle before stopping rotating */
+  private previousAngle: number = 0;
+  /** The radian angle between each elements */
+  private initialAngle: number = 0;
+
+  /** The length from circle center to the item center */
+  get radiusToItemCenter() {
+    return this.circleSize / 2 - this.itemSize / 2;
+  }
 
   created() {
-    const initialAngle = 360 / this.items.length;
+    this.initialAngle = (2 * Math.PI) / this.items.length; // One item angle in radians
     let rot = 0;
     this.bubbles = this.items.map(item => {
-      const i = {
+      const b: Bubble = {
         value: item,
-        rot1: rot * (Math.PI / 180),
-        translate: this.circleSize / 2 - this.itemSize / 2
+        rotation: rot,
+        translate: this.radiusToItemCenter
       };
-      rot += initialAngle;
-      return i;
+      rot += this.initialAngle;
+      return b;
     });
   }
 
-  spinScroll(evt: MouseEvent) {
-    if (evt.buttons) {
-      this.spinnerCenter = this.getSpinnerCenterPoint();
+  /** Reset origin and sets the previousAngle value (where the rotation stopped */
+  resetOrigin() {
+    this.origin = null;
+    this.previousAngle = this.angle;
+  }
 
+  /** On scroll, compute the angle of rotation for the spinner */
+  spinScroll(evt: MouseEvent | TouchEvent) {
+    const pointClicked = this.getPointFromEvent(evt);
+    if (evt instanceof MouseEvent && evt.buttons || evt instanceof TouchEvent) {
+      this.spinnerCenter = this.getSpinnerCenterPoint();
       const currentPoint: Point = {
-        x: evt.clientX - this.spinnerCenter.x,
-        y: this.spinnerCenter.y - evt.clientY
+        x: pointClicked.x - this.spinnerCenter.x,
+        y: this.spinnerCenter.y - pointClicked.y,
       };
       // If no origin, then this first click is the origin point.
       if (!this.origin) this.origin = currentPoint;
 
-      this.signedAngle = this.get360angle(
+      // Compute the signed angle (i.e. on 360º) between the [center, origin] and [center, currentPoint] segments
+      this.angle = (this.previousAngle + Vector.get360angle(
         new Vector([currentPoint.x, currentPoint.y, 0]),
         new Vector([this.origin.x, this.origin.y, 0])
-      );
+      )) % (2 * Math.PI);
+
+      // We update the style of each item using the new angle
+      this.bubbles.forEach((bubble, index) => {
+        const newItemAngle = this.initialAngle * index + this.angle;
+        bubble.rotation = newItemAngle;
+      });
     } else {
-      this.origin = null;
+      this.resetOrigin();
+    }
+  }
+
+  /** Get the clicked / touched point from mouse or touch event */
+  private getPointFromEvent(evt: MouseEvent | TouchEvent): Point {
+    if (evt instanceof MouseEvent) {
+      return { x: evt.clientX, y: evt.clientY };
+    } else if (evt instanceof TouchEvent) {
+      return { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
+    } else {
+      return { x: 0, y: 0 };
     }
   }
 
   private getSpinnerCenterPoint(): Point {
     const spinnerRef: HTMLElement = this.$refs.spinner as HTMLElement;
     return {
-      x: spinnerRef.offsetLeft + spinnerRef.offsetWidth / 2,
-      y: spinnerRef.offsetTop + spinnerRef.offsetHeight / 2
+      x: spinnerRef.getBoundingClientRect().left + spinnerRef.offsetWidth / 2,
+      y: spinnerRef.getBoundingClientRect().top + spinnerRef.offsetHeight / 2
     };
-  }
-
-  private get360angle(Va: Vector, Vb: Vector) {
-    return -Math.atan2(
-      Vb.cross(Va).dot(new Vector([0, 0, 1]).normalize()),
-      Va.dot(Vb)
-    );
   }
 }
 </script>
@@ -120,70 +149,8 @@ export default class HelloWorld extends Vue {
 .main {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
-}
-.item {
-  width: 50px;
-  height: 50px;
-  border-radius: 50px;
-  background-color: red;
-  color: white;
-  display: flex;
-  align-items: center;
   justify-content: center;
 }
-
-.point {
-  position: absolute;
-  background-color: blue;
-  width: 2px;
-  height: 2px;
-}
-
-/// Mixin to place items on a circle
-/// @author Hugo Giraudel
-/// @author Ana Tudor
-/// @param {Integer} $item-count - Number of items on the circle
-/// @param {Length} $circle-size - Large circle size
-/// @param {Length} $item-size - Single item size
-@mixin on-circle($item-count, $circle-size, $item-size) {
-  position: relative;
-  width: $circle-size;
-  height: $circle-size;
-  padding: 0;
-  border-radius: 50%;
-  list-style: none;
-
-  > * {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: $item-size;
-    height: $item-size;
-    margin: -($item-size / 2);
-
-    $angle: (360 / $item-count);
-    $rot: 0;
-
-    // @for $i from 1 through $item-count {
-    //   &:nth-of-type(#{$i}):not(.center) {
-    //     transform: rotate($rot * 1deg)
-    //       translate(($circle-size / 2) - ($item-size / 2))
-    //       rotate($rot * -1deg); // Last rotate is the item itself
-    //   }
-
-    //   $rot: $rot + $angle;
-    // }
-  }
-}
-
-@keyframes spin {
-  100% {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-}
-
 .spinner {
   position: relative;
   padding: 0;
@@ -194,7 +161,20 @@ export default class HelloWorld extends Vue {
     top: 50%;
     left: 50%;
   }
-  // @include on-circle($item-count: 6, $circle-size: 20em, $item-size: 5em);
-  // animation: spin 1s linear 1s;
+  .item {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .spinner-center {
+    width: 5em;
+    height: 5em;
+    margin: calc(-5em/2);
+  }
 }
 </style>
