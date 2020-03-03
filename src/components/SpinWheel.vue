@@ -2,14 +2,13 @@
   <div
     class="spinner"
     ref="spinner"
-    v-on:mousemove="spinScroll"
     unselectable="on"
     onselectstart="return false;"
     onmousedown="return false;"
-    onmousemove="spinScroll(event)"
-    onmouseup="resetOrigin(event)"
-    ontouchend="resetOrigin(event)"
-    ontouchmove="spinScroll(event)"
+    @mousemove="spinScroll"
+    @mouseup="resetOrigin"
+    @touchend="resetOrigin"
+    @touchmove="spinScroll"
     :style="{
       width: `${circleSize}em`,
       height: `${circleSize}em`
@@ -24,7 +23,8 @@
         }em) rotate(${-item.rotation}rad)`,
         width: `${itemSize}em`,
         height: `${itemSize}em`,
-        margin: `${-(itemSize / 2)}em`
+        margin: `${-(itemSize / 2)}em`,
+        transition: item.transition
       }"
     >
       {{ item.value }}
@@ -46,6 +46,7 @@ interface Bubble {
   value: string;
   rotation: number;
   translate: number;
+  transition?: string;
 }
 
 // TODO Use JSX instead to render templates
@@ -82,7 +83,8 @@ export default class SpinWheel extends Vue {
       const b: Bubble = {
         value: item,
         rotation: rot,
-        translate: this.radiusToItemCenter
+        translate: this.radiusToItemCenter,
+        transition: undefined,
       };
       rot += this.initialAngle;
       return b;
@@ -90,9 +92,13 @@ export default class SpinWheel extends Vue {
   }
 
   /** Reset origin and sets the previousAngle value (where the rotation stopped */
-  resetOrigin() {
+  resetOrigin(evt: any) {
     this.origin = null;
     this.previousAngle = this.angle;
+    this.bubbles.forEach(b => {
+      b.rotation = b.rotation + Math.PI;
+      b.transition = `transform 2s cubic-bezier(0.28, 0.44, 0.57, 1) 0s`
+    });
   }
 
   /** On scroll, compute the angle of rotation for the spinner */
@@ -117,9 +123,8 @@ export default class SpinWheel extends Vue {
       this.bubbles.forEach((bubble, index) => {
         const newItemAngle = this.initialAngle * index + this.angle;
         bubble.rotation = newItemAngle;
+        bubble.transition = undefined;
       });
-    } else {
-      this.resetOrigin();
     }
   }
 
