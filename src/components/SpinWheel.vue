@@ -36,18 +36,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { Vector } from "ts-matrix";
-
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface Bubble {
-  value: string;
-  rotation: number;
-  translate: number;
-  transition?: string;
-}
+import { Bubble, Point } from "../types/types";
 
 // TODO Use JSX instead to render templates
 @Component
