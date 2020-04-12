@@ -11,11 +11,14 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "declaration": true,
-    "declarationDir": "dist",
+    // "declaration": true,
+    // "declarationDir": "types",
     "baseUrl": ".",
     "types": [
       "webpack-env"
+    ],
+    "typeRoots": [
+      "./types"
     ],
     "paths": {
       "@/*": [
@@ -31,10 +34,9 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "types/**/*.d.ts",
   ],
   "exclude": [
     "node_modules"

@@ -21,6 +21,11 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { Vector } from "ts-matrix";
 import { Bubble, Point } from "../types/types";
 
+/**
+ * Enable elements to spin with user click or touch drags.
+ * 
+ * Warning: on mobile browser, it avoids the page to scroll when the user touch the SpinWheel.
+ */
 @Component
 export default class SpinWheel extends Vue {
 

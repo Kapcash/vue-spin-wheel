@@ -36,13 +36,15 @@ import SpinCircle from "./components/SpinCircle.vue";
     SpinCircle,
   }
 })
-export default class App extends Vue {
+export default class Demo extends Vue {
   gravity = true;
   items = ['NEVER', 'GONNA', 'GIVE', 'YOU', 'UP'];
+  index = 0;
 
   addItem(){
-    this.items.push('TEST' + Math.floor(Math.random()*1000));
+    this.items.push('TEST' + ++this.index);
   }
+
   removeItem(){
     this.items.splice(-1);
   }
