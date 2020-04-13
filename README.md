@@ -36,21 +36,6 @@ import { SpinWheel, SpinItem, SpinCircle } from 'vue-spin-wheel';
 
 And you'll be able to use them!
 
-### Error: "$attr is readonly"
-
-If you get these error messages from the browser console, you may have encountered a common Vue in Typescript obstacle.
-To fix it, edit your webpack configuration adding:
-
-```javascript
-var path = require('path')
-...
-resolve: {
-    alias: {
-        'vue': path.resolve('./node_modules/vue')
-    }
-}
-```
-
 It seems to be a problem with multiple `require("vue")` in the bundle.
 This will be likely fixed in VueJS 3.0, as it will be build in full Typescript and therefore improve the Typescript builds and global Typescript integration errors.
 
