@@ -175,6 +175,7 @@ Feel free to open an issue on the github page. I'll take a look as quickly as po
 
 ## Roadmap:
 
+- Automatic declaration files generation
 - Add `circleDiameter` property for `SpinCircle`.
 - Allow `rotation` property of `SpinItem` to be in degrees instead of radians (by auto converting)
 - Try to build the lib as native web components
