@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="demo">
     <spin-wheel v-slot="{ angle }" class="flower">
       <spin-circle :gravity="gravity" :items="items">
 
@@ -52,7 +52,7 @@ export default class Demo extends Vue {
 </script>
 
 <style lang="scss">
-#app {
+#demo {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

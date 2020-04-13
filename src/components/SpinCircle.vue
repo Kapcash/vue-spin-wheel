@@ -90,9 +90,13 @@ export default class SpinCircle<T> extends Vue {
       align-items: center;
       // Class to display a default bubble item in the circle slot
       .default-bubble {
-        $size: 50px;
+        $size: 80px;
         height: $size;
         width: $size;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         background-color: rgb(0, 212, 177);
         color: black;
         border-radius: 100%;

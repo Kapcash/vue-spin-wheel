@@ -2,7 +2,7 @@
 
 VueSpinWheel is a small VueJS component library, providing small reusable components to make a wheel, draggable by user clicks and touchs.
 
-TODO Demo gif
+![vue-spin-wheel demo gif](./assets/vue-spin-wheel-demo.gif)
 
 It also **works on mobile browsers**, handling touches as mouse clicks.
 
@@ -10,7 +10,7 @@ It also **works on mobile browsers**, handling touches as mouse clicks.
 
 A full demo of all the components is available in the `Demo.vue` file of this repo.
 
-You can see this component live here: [Live Demo (TODO: Add a link.)]()
+You can see this component live here: [Live Demo ](https://codepen.io/Kapcash/pen/abvORoV)
 
 ## Setup
 
@@ -36,21 +36,13 @@ import { SpinWheel, SpinItem, SpinCircle } from 'vue-spin-wheel';
 
 And you'll be able to use them!
 
-It seems to be a problem with multiple `require("vue")` in the bundle.
-This will be likely fixed in VueJS 3.0, as it will be build in full Typescript and therefore improve the Typescript builds and global Typescript integration errors.
-
-> Be sure that I will update this library as soon as VueJS 3 is out!
-
-Official documention mentionning it: [Runtime + Compiler vs. Runtime-only](https://vuejs.org/v2/guide/installation.html#Runtime-Compiler-vs-Runtime-only)
-Related github issues: [bootstrap-vue:issues#3040](https://github.com/bootstrap-vue/bootstrap-vue/issues/3040#issuecomment-484583285) [vue-file-agent:issue#33](https://github.com/safrazik/vue-file-agent/issues/33#issuecomment-574533170)
-
 ## Available components
 
 ### SpinWheel
 
 **Allows you to rotate its sub elements by dragging them with the cursor.**
 
-TODO Gif
+![SpinWheel demo gif](./assets/spin-wheel-demo.gif)
 
 ```html
 <spin-wheel>
@@ -65,7 +57,7 @@ TODO Gif
 The circle's size is defined by its root element size, which by default is depending on its parent element.  
 So be aware that you should provide a width / heigh to the parent element of the `<spin-circle>` to define its bounds.
 
-TODO Gif
+![SpinCircle demo gif](./assets/spin-circle-demo.gif)
 
 ```html
 <spin-circle :gravity="gravity" :items="items"></spin-circle>
@@ -75,7 +67,7 @@ The component exposes the rotation angle as a slot scope, so that you can freely
 
 |Slot|Description|Slot scope|
 |----|-----------|----------|
-|default|The elements to rotate in the wheel|`angle`|
+|default|The elements to rotate in the circle|`angle`|
 
 #### Available properties
 
@@ -167,6 +159,8 @@ Just run:
 ```bash
 # install dependencies
 yarn
+# You need to add vue, as its a peer dependency
+yarn add vue
 # Run the app
 yarn serve
 ```
@@ -181,7 +175,6 @@ Feel free to open an issue on the github page. I'll take a look as quickly as po
 
 ## Roadmap:
 
-- Fix 'missing declaration file' for Typescript imports.
 - Add `circleDiameter` property for `SpinCircle`.
 - Allow `rotation` property of `SpinItem` to be in degrees instead of radians (by auto converting)
 - Try to build the lib as native web components
