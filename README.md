@@ -2,7 +2,7 @@
 
 VueSpinWheel is a small VueJS component library, providing small reusable components to make a wheel, draggable by user clicks and touchs.
 
-![vue-spin-wheel demo gif](./assets/vue-spin-wheel-demo.gif)
+![vue-spin-wheel demo gif](./public/vue-spin-wheel-demo.gif)
 
 It also **works on mobile browsers**, handling touches as mouse clicks.
 
@@ -42,7 +42,7 @@ And you'll be able to use them!
 
 **Allows you to rotate its sub elements by dragging them with the cursor.**
 
-![SpinWheel demo gif](./assets/spin-wheel-demo.gif)
+![SpinWheel demo gif](./public/spin-wheel-demo.gif)
 
 ```html
 <spin-wheel>
@@ -57,7 +57,7 @@ And you'll be able to use them!
 The circle's size is defined by its root element size, which by default is depending on its parent element.  
 So be aware that you should provide a width / heigh to the parent element of the `<spin-circle>` to define its bounds.
 
-![SpinCircle demo gif](./assets/spin-circle-demo.gif)
+![SpinCircle demo gif](./public/spin-circle-demo.gif)
 
 ```html
 <spin-circle :gravity="gravity" :items="items"></spin-circle>
