@@ -1,7 +1,11 @@
 {
   "name": "vue-spin-wheel",
   "version": "0.1.0",
-  "private": true,
+  "author": {
+    "name": "Florent Catiau-Tristant"
+  },
+  "keywords": ["vue", "vuejs", "typescript", "components", "wheel", "spin", "spinner", "circle"],
+  "private": false,
   "main": "./dist/vue-spin-wheel.umd",
   "unpkg": "./dist/vue-spin-wheel.umd.min",
   "types": "./types/main.d.ts",

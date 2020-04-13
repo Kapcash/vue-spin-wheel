@@ -1,0 +1,11 @@
+node_modules/
+src/
+
+.browserslistrc
+.eslintrc.js
+.gitignore
+.npmignore
+babel.config.js
+vue.config.js
+tsconfig.json
+yarn.lock
