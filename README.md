@@ -10,7 +10,7 @@ It also **works on mobile browsers**, handling touches as mouse clicks.
 
 A full demo of all the components is available in the `Demo.vue` file of this repo.
 
-You can see this component live here: [Live Demo ](https://codepen.io/Kapcash/pen/abvORoV)
+You can see this component live here: [Live Demo ](https://codesandbox.io/s/vue-spin-wheel-exemple-gldnp?file=/src/Demo.vue)
 
 ## Setup
 
