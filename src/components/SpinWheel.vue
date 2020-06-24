@@ -28,7 +28,6 @@ import { Bubble, Point } from "../types/types";
  */
 @Component
 export default class SpinWheel extends Vue {
-
   /** The point of first click before drag */
   private origin: Point | null = null;
   /** The center point of the spinner div */

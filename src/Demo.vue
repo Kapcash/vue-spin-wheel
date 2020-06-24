@@ -17,9 +17,13 @@
 
       </spin-circle>
     </spin-wheel>
-    <button @click="addItem">Add item</button>
-    <button @click="removeItem">Remove item</button>
-    <button @click="gravity = !gravity">{{gravity ? 'No gravity' : 'Gravity'}}</button>
+
+    <div class="actions">
+      <button @click="addItem">Add item</button>
+      <button @click="removeItem">Remove item</button>
+      <input type="checkbox" v-model="gravity" name="gravityCheck">
+      <label for="gravityCheck">{{gravity ? 'Gravity' : 'No gravity'}}</label>
+    </div>
   </div>
 </template>
 
@@ -41,11 +45,11 @@ export default class Demo extends Vue {
   items = ['NEVER', 'GONNA', 'GIVE', 'YOU', 'UP'];
   index = 0;
 
-  addItem(){
-    this.items.push('TEST' + ++this.index);
+  addItem() {
+    this.items.push(`TEST-${++this.index}`);
   }
 
-  removeItem(){
+  removeItem() {
     this.items.splice(-1);
   }
 }
@@ -63,6 +67,13 @@ export default class Demo extends Vue {
   align-items: center;
   justify-content: center;
 
+  .actions {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    justify-content: center;
+  }
+
   .flower {
     margin: 150px;
     width: 200px;
@@ -77,6 +88,10 @@ export default class Demo extends Vue {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .spinner-center .bubble {
+    background-color: red;
   }
 }
 </style>

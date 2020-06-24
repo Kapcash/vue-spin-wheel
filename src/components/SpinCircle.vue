@@ -27,10 +27,6 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
  */
 @Component
 export default class SpinCircle<T> extends Vue {
-
-  /** The diameter in px of the circle on which we display the items */
-  private diameter: number = 0;
-
   /**
    * Enables gravity on the items
    * If enabled, the items will rotate themself as much as their circle position make them rotate,
@@ -45,6 +41,9 @@ export default class SpinCircle<T> extends Vue {
   @Prop({ type: Array, required: true })
   items!: T[];
   
+  /** The diameter in px of the circle on which we display the items */
+  private diameter: number = 0;
+
   /** Return the items coupled with their circle style position */
   get bubbles(): Array<{ item: T, style: any }> {
     return this.items.map((item, index) => ({ item: item, style: this.transformBubbleStyle(index) }));
