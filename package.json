@@ -6,6 +6,7 @@
   },
   "keywords": ["vue", "vuejs", "typescript", "components", "wheel", "spin", "spinner", "circle"],
   "private": false,
+  "license": "MIT",
   "main": "./dist/vue-spin-wheel.umd",
   "unpkg": "./dist/vue-spin-wheel.umd.min",
   "types": "./types/main.d.ts",
