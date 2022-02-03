@@ -13,10 +13,13 @@ export default class SpinCircle<T> extends Vue {
      * If enabled, the items will rotate themself as much as their circle position make them rotate,
      * so that their always appear horizontal.
      */
-    gravity: boolean;
+    readonly gravity: boolean;
 
     /** List of items data to display in the circle
      * Can be of any type, the display elements are to be defined using the 'bubble' slot
      */
-    items: T[];
+    readonly items: T[];
+
+    /** The name of an item property to use as a unique key */
+    readonly itemKey: keyof T;
 }
