@@ -75,6 +75,7 @@ The component exposes the rotation angle as a slot scope, so that you can freely
 |----|----|-----------|-------|
 |items|`Array<T>`|List of custom elements to display in the circle. If `T` is not `string`, you should provide the #bubble slot (see below)|[]|
 |gravity|`boolean`|Keep all elements horizontal, or let them rotate freely|false|
+|item-key|`keyof T`|Optional. The name of a key of your items to be used as a unique key index|the index `i` of the item|
 
 By default, it will display each element of `items` in a span. If the items are not strings, it will display the default `item.toString()` javascript behavior.
 
