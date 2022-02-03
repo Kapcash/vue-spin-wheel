@@ -10,7 +10,8 @@
       @mouseup="resetOrigin"
       @touchend="resetOrigin"
       @touchmove="spinScroll"
-      :style="{ transform: `rotate(${angle}rad)` }">
+      :style="{ transform: `rotate(${angle}rad)` }"
+    >
       <slot :angle="angle"></slot>
     </div>
   </div>
@@ -104,11 +105,13 @@ export default class SpinWheel extends Vue {
 
 <style scoped lang="scss">
 .spinner-wrapper {
+  height: 1px;
   .spinner {
     position: relative;
     padding: 0;
-    width: 100%;
-    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    height: 1px;
   }
 }
 </style>
