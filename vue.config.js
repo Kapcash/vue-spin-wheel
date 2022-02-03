@@ -1,4 +1,11 @@
 module.exports = {
+  css: {
+    loaderOptions: {
+      sass: {
+        implementation: require('sass')
+      }
+    }
+  },
   chainWebpack: config => {
     if(process.env.NODE_ENV === 'production') {
       config.module.rule("ts").uses.delete("cache-loader");
