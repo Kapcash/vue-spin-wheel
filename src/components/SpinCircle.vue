@@ -1,7 +1,7 @@
 <template>
   <div class="spin-circle" ref="circle">
     <ul>
-      <li v-for="bubble in bubbles" :key="bubble.item" :style="bubble.style">
+      <li v-for="(bubble, index) in bubbles" :key="bubble.item[itemKey] || index" :style="bubble.style">
         <slot name="bubble" :item="bubble.item">
           <span class="default-bubble">BUBBLE</span> <!-- Default slot content -->
         </slot>
@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
 /**
  * Display a list of items on a circle.
@@ -33,13 +33,17 @@ export default class SpinCircle<T> extends Vue {
    * so that their always appear horizontal.
    */
   @Prop({ type: Boolean, default: false })
-  gravity!: boolean;
+  readonly gravity!: boolean;
+
+  /** The name of an item property to use as a unique key */
+  @Prop({ type: String, default: 'label' })
+  readonly itemKey!: keyof T;
 
   /** List of items data to display in the circle
    * Can be of any type, the display elements are to be defined using the 'bubble' slot
    */
   @Prop({ type: Array, required: true })
-  items!: T[];
+  readonly items!: T[];
   
   /** The diameter in px of the circle on which we display the items */
   private diameter: number = 0;

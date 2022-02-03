@@ -18,6 +18,3 @@ export default class SpinItem extends Vue {
   rotation!: number;
 }
 </script>
-
-<style scoped lang="scss">
-</style>
