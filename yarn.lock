@@ -7858,11 +7858,6 @@ ts-loader@^6.2.2:
     micromatch "^4.0.0"
     semver "^6.0.0"
 
-ts-matrix@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ts-matrix/-/ts-matrix-1.0.0.tgz#82fdec9179a9304c8e7c5e0212b052227a0850a3"
-  integrity sha512-rUO0WRb/arEopf9UEEFi7M1/Thflk3DOVN/3yMO+el4FjYTaZhZ07T6h5fpzATbOLG/IzMRqk4qyVzUZedArsg==
-
 ts-pnp@^1.1.6:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.2.0.tgz#a500ad084b0798f1c3071af391e65912c86bca92"

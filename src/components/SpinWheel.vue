@@ -5,10 +5,10 @@
       ref="spinner"
       unselectable="on"
       onselectstart="return false;"
-      onmousedown="return false;"
+      @mousedown="startSpin"
       @mousemove="spinScroll"
-      @mouseup="resetOrigin"
-      @touchend="resetOrigin"
+      @mouseup="stopSpin"
+      @touchend="stopSpin"
       @touchmove="spinScroll"
       :style="{ transform: `rotate(${angle}rad)` }"
     >
@@ -18,9 +18,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import { Vector } from "ts-matrix";
-import { Bubble, Point } from "../types/types";
+import { Component, Vue } from "vue-property-decorator";
+import { Point } from "../types/types";
 
 /**
  * Enable elements to spin with user click or touch drags.
@@ -29,21 +28,23 @@ import { Bubble, Point } from "../types/types";
  */
 @Component
 export default class SpinWheel extends Vue {
-  /** The point of first click before drag */
-  private origin: Point | null = null;
   /** The center point of the spinner div */
-  private spinnerCenter: Point = { x: 0, y: 0 };
+  spinnerCenter: Point = { x: 0, y: 0 };
   /** The current rotation radian angle */
-  private angle: number = -(Math.PI / 2); // Default value is 90º so that the first element is on top
+  angle: number = -(Math.PI / 2); // Default value is 90º so that the first element is on top
   /** The last rotation radian angle before stopping rotating */
-  private previousAngle: number = -(Math.PI / 2);
+  previousAngle: number = -(Math.PI / 2);
+  /** The first interaction radian angle before spinning */
+  startAngle: number = 0;
+
+  startSpin (evt: MouseEvent | TouchEvent) {
+    const currentPoint = this.getCurrentPointFromCenter(evt);
+    this.startAngle = -Math.atan2(currentPoint.y, currentPoint.x)
+  }
 
   /** Reset origin and sets the previousAngle value (where the rotation stopped */
-  resetOrigin(evt: any) {
-    this.origin = null;
+  stopSpin() {
     this.previousAngle = this.angle;
-    (this.$refs.spinner as HTMLElement).style.transition = `transform 2s cubic-bezier(0.28, 0.44, 0.57, 1) 0s`;
-    // this.angle += Math.PI;
   }
 
   /**
@@ -51,17 +52,11 @@ export default class SpinWheel extends Vue {
    */
   spinScroll(evt: MouseEvent | TouchEvent) {
     if (evt instanceof MouseEvent && evt.buttons || evt instanceof TouchEvent) {
-      (this.$refs.spinner as HTMLElement).style.transition = '';
       const currentPoint = this.getCurrentPointFromCenter(evt);
 
-      // If no origin, then this first click is the origin point.
-      if (!this.origin) this.origin = currentPoint;
-
-      // Compute the signed angle (i.e. on 360º) between the [center, origin] and [center, currentPoint] segments
-      this.angle = (this.previousAngle + Vector.get360angle(
-        new Vector([currentPoint.x, currentPoint.y, 0]),
-        new Vector([this.origin.x, this.origin.y, 0])
-      )) % (2 * Math.PI);
+      const newAngle = -Math.atan2(currentPoint.y, currentPoint.x)
+      const angleOffset =  (newAngle - this.startAngle)
+      this.angle = this.previousAngle + angleOffset;
     }
   }
 
